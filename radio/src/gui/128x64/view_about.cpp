@@ -42,7 +42,7 @@ enum AboutScreens {
 #define ABOUT_X      2
 #define ABOUT_INDENT 4
 
-#if defined(PCBX7)
+#if defined(PCBT12)
 #define EVT_KEY_PREVIOUS_VIEW          EVT_KEY_LONG(KEY_PAGE)
 #define EVT_KEY_NEXT_VIEW              EVT_KEY_BREAK(KEY_PAGE)
 #else
@@ -87,11 +87,11 @@ void menuAboutView(event_t event)
   switch (screenIndex) {
     case ABOUT_OPENTX:
     case ABOUT_END:
-      lcdDrawText(ABOUT_X, 22, STR_ABOUT_OPENTX_1, SMLSIZE);
-      lcdDrawText(ABOUT_X, 30, STR_ABOUT_OPENTX_2, SMLSIZE);
-      lcdDrawText(ABOUT_X, 38, STR_ABOUT_OPENTX_3, SMLSIZE);
-      lcdDrawText(ABOUT_X, 46, STR_ABOUT_OPENTX_4, SMLSIZE);
-      lcdDrawText(ABOUT_X, 54, STR_ABOUT_OPENTX_5, SMLSIZE);
+      lcdDrawText(ABOUT_X, 22, STR_ABOUT_JUMPERTX_1, SMLSIZE);
+      lcdDrawText(ABOUT_X, 30, STR_ABOUT_JUMPERTX_2, SMLSIZE);
+      lcdDrawText(ABOUT_X, 38, STR_ABOUT_JUMPERTX_3, SMLSIZE);
+      lcdDrawText(ABOUT_X, 46, STR_ABOUT_JUMPERTX_4, SMLSIZE);
+      lcdDrawText(ABOUT_X, 54, STR_ABOUT_JUMPERTX_5, SMLSIZE);
       screenDuration = 255;
       break;
 

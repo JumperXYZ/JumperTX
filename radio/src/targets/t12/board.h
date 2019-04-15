@@ -542,9 +542,9 @@ uint8_t isBacklightEnabled(void);
 #if !defined(SIMU)
   void usbJoystickUpdate();
 #endif
-#define USB_NAME                        "FrSky Taranis"
-#define USB_MANUFACTURER                'F', 'r', 'S', 'k', 'y', ' ', ' ', ' '  /* 8 bytes */
-#define USB_PRODUCT                     'T', 'a', 'r', 'a', 'n', 'i', 's', ' '  /* 8 Bytes */
+#define USB_NAME                        "Jumper T12"
+#define USB_MANUFACTURER                'J', 'u', 'm', 'p', 'e', 'r', ' ', ' '  /* 8 bytes */
+#define USB_PRODUCT                     'T', '1', '2', ' ', ' ', ' ', ' ', ' '  /* 8 Bytes */
 
 #if defined(__cplusplus) && !defined(SIMU)
 }

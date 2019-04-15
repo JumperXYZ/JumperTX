@@ -21,6 +21,7 @@
 #ifndef _HAL_H_
 #define _HAL_H_
 
+#define KEY_EMULATED_ROTENCODER
 // Keys
 #if defined(PCBX9E)
   #define KEYS_GPIO_REG_MENU            GPIOD->IDR

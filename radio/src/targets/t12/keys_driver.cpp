@@ -114,9 +114,60 @@ bool keyDown()
   return readKeys() || readTrims();
 }
 
+#ifdef KEY_EMULATED_ROTENCODER
+static bool keyPressed = false;
+static bool UpKeyPressed = true;
+static uint8_t loop5msCnt = 0;
+#endif
 #if defined(ROTARY_ENCODER_NAVIGATION)
 void checkRotaryEncoder()
 {
+#ifdef KEY_EMULATED_ROTENCODER
+  uint32_t newpos = ROTARY_ENCODER_POSITION();
+  if (newpos != rotencPosition && !keyState(KEY_ENTER)) {
+    if ((rotencPosition & 0x01) && !(newpos & 0x01)) {
+      --rotencValue[0];
+	  UpKeyPressed = false;
+	  keyPressed = true;
+    }
+    else if ((rotencPosition & 0x02) && !(newpos & 0x02)){
+      ++rotencValue[0];
+	  UpKeyPressed = true;
+	  keyPressed = true;
+    }
+    rotencPosition = newpos;
+#if !defined(BOOT)
+    if (g_eeGeneral.backlightMode & e_backlight_mode_keys) {
+      backlightOn();
+    }
+#endif
+}
+  if (keyPressed)
+  {
+	if ((newpos & 0x03) == 0x03) // 0 if button pressed-down
+	{
+      keyPressed = false;
+	}
+	
+	if (keyPressed)
+	{
+      loop5msCnt++;
+	  if (loop5msCnt == 50)
+	  {
+		  if (UpKeyPressed)
+			  ++rotencValue[0];
+		  else
+			  --rotencValue[0];
+		  loop5msCnt = 0;
+	  }
+    }
+	else
+	{
+      loop5msCnt = 0;
+	}  
+  }
+}
+#else // #ifdef KEY_EMULATED_ROTENCODER
   uint32_t newpos = ROTARY_ENCODER_POSITION();
   if (newpos != rotencPosition && !keyState(KEY_ENTER)) {
     if ((rotencPosition & 0x01) ^ ((newpos & 0x02) >> 1)) {
@@ -133,7 +184,8 @@ void checkRotaryEncoder()
 #endif
   }
 }
-#endif
+#endif // #ifdef KEY_EMULATED_ROTENCODER
+#endif // ROTARY_ENCODER_NAVIGATION
 
 /* TODO common to ARM */
 void readKeysAndTrims()
