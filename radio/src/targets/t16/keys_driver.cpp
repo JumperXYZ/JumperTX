@@ -25,7 +25,7 @@ void checkRotaryEncoder()
   static uint8_t  state = 0;
   uint32_t pins = ROTARY_ENCODER_POSITION();
 
-  if (pins != (state & 0x03)) {
+  if (pins != (state & 0x03) && !keyState(KEY_ENTER)) {
     if ((pins & 0x01) ^ ((pins & 0x02) >> 1)) {
       if ((state & 0x03) == 3)
         ++rotencValue[0];
@@ -36,7 +36,7 @@ void checkRotaryEncoder()
     {
       if ((state & 0x03) == 3)
          --rotencValue[0];
-      if ((state & 0x03) == 0)
+      else if ((state & 0x03) == 0)
          ++rotencValue[0];
     }
     state &= ~0x03 ;
