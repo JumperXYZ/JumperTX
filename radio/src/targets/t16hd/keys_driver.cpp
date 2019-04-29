@@ -43,19 +43,26 @@
 #define R_START_M 0x3
 #define R_CW_BEGIN_M 0x4
 #define R_CCW_BEGIN_M 0x5
-const unsigned char rotenc_table[6][4] = {
-  // R_START (00)
-  {R_START_M,            R_CW_BEGIN,     R_CCW_BEGIN,  R_START},
-  // R_CCW_BEGIN
-  {R_START_M | DIR_CCW, R_START,        R_CCW_BEGIN,  R_START},
-  // R_CW_BEGIN
-  {R_START_M | DIR_CW,  R_CW_BEGIN,     R_START,      R_START},
-  // R_START_M (11)
-  {R_START_M,            R_CCW_BEGIN_M,  R_CW_BEGIN_M, R_START},
-  // R_CW_BEGIN_M
-  {R_START_M,            R_START_M,      R_CW_BEGIN_M, R_START | DIR_CW},
-  // R_CCW_BEGIN_M
-  {R_START_M,            R_CCW_BEGIN_M,  R_START_M,    R_START | DIR_CCW},
+// const unsigned char rotenc_table[6][4] = {
+//   // R_START (00)
+//   {R_START_M,            R_CW_BEGIN,     R_CCW_BEGIN,  R_START},
+//   // R_CCW_BEGIN
+//   {R_START_M | DIR_CCW, R_START,        R_CCW_BEGIN,  R_START},
+//   // R_CW_BEGIN
+//   {R_START_M | DIR_CW,  R_CW_BEGIN,     R_START,      R_START},
+//   // R_START_M (11)
+//   {R_START_M,            R_CCW_BEGIN_M,  R_CW_BEGIN_M, R_START},
+//   // R_CW_BEGIN_M
+//   {R_START_M,            R_START_M,      R_CW_BEGIN_M, R_START | DIR_CW},
+//   // R_CCW_BEGIN_M
+//   {R_START_M,            R_CCW_BEGIN_M,  R_START_M,    R_START | DIR_CCW},
+// };
+
+const unsigned char rotenc_table[4][4] = {
+    {0x13, 0x02, 0x01, 0x00},
+    {0x23, 0x02, 0x01, 0x10},
+    {0x03, 0x02, 0x01, 0x00},
+    {0x03, 0x02, 0x01, 0x20}
 };
 
 void checkRotaryEncoder()
