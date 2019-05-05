@@ -174,10 +174,10 @@ void setupPulsesSbus(uint8_t port);
 void setupPulsesPXX(uint8_t port);
 void setupPulsesPPMModule(uint8_t port);
 void setupPulsesPPMTrainer();
-void sendByteDsm2(uint8_t b);
-void putDsm2Flush();
-void putDsm2SerialBit(uint8_t bit);
-void sendByteSbus(uint8_t byte);
+void sendByteDsm2(uint8_t port, uint8_t b);
+void putDsm2Flush(uint8_t port);
+void putDsm2SerialBit(uint8_t port, uint8_t bit);
+void sendByteSbus(uint8_t port, uint8_t byte);
 
 #if defined(HUBSAN)
 void Hubsan_Init();

@@ -55,7 +55,8 @@ bool isSwitchAvailableInCustomFunctions(int swtch);
 bool isSwitchAvailableInMixes(int swtch);
 bool isSwitchAvailableInTimers(int swtch);
 bool isR9MModeAvailable(int mode);
-bool isModuleAvailable(int module);
+bool isExternalModuleAvailable(int module);
+bool isInternalModuleAvailable(int module);
 bool isRfProtocolAvailable(int protocol);
 bool isTelemetryProtocolAvailable(int protocol);
 bool isTrainerModeAvailable(int mode);
@@ -115,13 +116,14 @@ void runFatalErrorScreen(const char * message);
 
 void lcdDrawMMM(coord_t x, coord_t y, LcdFlags flags=0);
 
-// model_setup Defines that are used in all uis in the same way
 #define EXTERNAL_MODULE_CHANNELS_ROWS   IF_EXTERNAL_MODULE_ON((IS_MODULE_DSM2(EXTERNAL_MODULE) || IS_MODULE_CROSSFIRE(EXTERNAL_MODULE) || IS_MODULE_SBUS(EXTERNAL_MODULE) || (IS_MODULE_MULTIMODULE(EXTERNAL_MODULE) && g_model.moduleData[EXTERNAL_MODULE].getMultiProtocol(true) != MM_RF_PROTO_DSM2)) ? (uint8_t)0 : (uint8_t)1)
+#define INTERNAL_MODULE_CHANNELS_ROWS   IF_INTERNAL_MODULE_ON((IS_MODULE_DSM2(INTERNAL_MODULE) || IS_MODULE_CROSSFIRE(INTERNAL_MODULE) || IS_MODULE_SBUS(INTERNAL_MODULE) || (IS_MODULE_MULTIMODULE(INTERNAL_MODULE) && g_model.moduleData[INTERNAL_MODULE].getMultiProtocol(true) != MM_RF_PROTO_DSM2)) ? (uint8_t)0 : (uint8_t)1)
+
 
 
 #if defined(MULTIMODULE)
-#define MULTIMODULE_STATUS_ROWS         IS_MODULE_MULTIMODULE(EXTERNAL_MODULE) ? TITLE_ROW : HIDDEN_ROW, (IS_MODULE_MULTIMODULE(EXTERNAL_MODULE) && multiSyncStatus.isValid()) ? TITLE_ROW : HIDDEN_ROW,
-#define MULTIMODULE_MODULE_ROWS         IS_MODULE_MULTIMODULE(EXTERNAL_MODULE) ? (uint8_t) 0 : HIDDEN_ROW,
+#define MULTIMODULE_STATUS_ROWS(x)      IS_MODULE_MULTIMODULE(x) ? TITLE_ROW : HIDDEN_ROW, (IS_MODULE_MULTIMODULE(x) && multiSyncStatus.isValid()) ? TITLE_ROW : HIDDEN_ROW,
+#define MULTIMODULE_MODULE_ROWS(x)      IS_MODULE_MULTIMODULE(x) ? (uint8_t) 0 : HIDDEN_ROW,
 #define MULTIMODULE_MODE_ROWS(x)        (g_model.moduleData[x].multi.customProto) ? (uint8_t) 3 :MULTIMODULE_HAS_SUBTYPE(g_model.moduleData[x].getMultiProtocol(true)) ? (uint8_t)2 : (uint8_t)1
 #define MULTIMODULE_RFPROTO_ROWS(x)     (g_model.moduleData[x].multi.customProto) ? (uint8_t) 1 :MULTIMODULE_HAS_SUBTYPE(g_model.moduleData[x].getMultiProtocol(true)) ? (uint8_t) 0 : HIDDEN_ROW
 #define MULTIMODULE_SUBTYPE_ROWS(x)     IS_MODULE_MULTIMODULE(x) ? MULTIMODULE_RFPROTO_ROWS(x) : HIDDEN_ROW,
@@ -129,7 +131,7 @@ void lcdDrawMMM(coord_t x, coord_t y, LcdFlags flags=0);
 #define MULTIMODULE_HASOPTIONS(x)       (getMultiProtocolDefinition(x)->optionsstr != nullptr)
 #define MULTI_MAX_RX_NUM(x)             (g_model.moduleData[x].getMultiProtocol(true) == MM_RF_PROTO_OLRS ? 4 : 15)
 #define MULTIMODULE_HASFAILSAFE(x)      (IS_MODULE_MULTIMODULE(x) && multiModuleStatus.isValid() && multiModuleStatus.supportsFailsafe())
-#define MULTIMODULE_OPTIONS_ROW         (IS_MODULE_MULTIMODULE(EXTERNAL_MODULE) && MULTIMODULE_HASOPTIONS(g_model.moduleData[EXTERNAL_MODULE].getMultiProtocol(true))) ? (uint8_t) 0: HIDDEN_ROW
+#define MULTIMODULE_OPTIONS_ROW(x)      (IS_MODULE_MULTIMODULE(x) && MULTIMODULE_HASOPTIONS(g_model.moduleData[x].getMultiProtocol(true))) ? (uint8_t) 0: HIDDEN_ROW
 
 // When using packed, the pointer in here end up not being aligned, which clang and gcc complain about
 // Keep the order of the fields that the so that the size stays small
@@ -143,13 +145,13 @@ struct mm_protocol_definition {
 
 const mm_protocol_definition *getMultiProtocolDefinition (uint8_t protocol);
 #else
-#define MULTIMODULE_STATUS_ROWS
-#define MULTIMODULE_MODULE_ROWS
-#define MULTIMODULE_HASFAILSAFE(x)         false
+#define MULTIMODULE_STATUS_ROWS(x)
+#define MULTIMODULE_MODULE_ROWS(x)
+#define MULTIMODULE_HASFAILSAFE(x)      false
 #define MULTIMODULE_SUBTYPE_ROWS(x)
 #define MULTIMODULE_MODE_ROWS(x)        (uint8_t)0
 #define MULTI_MAX_RX_NUM(x)             15
-#define MULTIMODULE_OPTIONS_ROW         HIDDEN_ROW
+#define MULTIMODULE_OPTIONS_ROW(x)      HIDDEN_ROW
 #endif
 
 
@@ -159,11 +161,16 @@ const mm_protocol_definition *getMultiProtocolDefinition (uint8_t protocol);
 
 #define FAILSAFE_ROWS(x)               ((IS_MODULE_XJT(x) && HAS_RF_PROTOCOL_FAILSAFE(g_model.moduleData[x].rfProtocol)) || MULTIMODULE_HASFAILSAFE(x) || IS_MODULE_R9M(x))  ? (g_model.moduleData[x].failsafeMode==FAILSAFE_CUSTOM ? (uint8_t)1 : (uint8_t)0) : HIDDEN_ROW
 
-#define EXTERNAL_MODULE_OPTION_ROW     (IS_MODULE_R9M(EXTERNAL_MODULE) || IS_MODULE_SBUS(EXTERNAL_MODULE)  ? TITLE_ROW : MULTIMODULE_OPTIONS_ROW)
+#define MODULE_OPTION_ROW(x)           (IS_MODULE_R9M(x) || IS_MODULE_SBUS(x)  ? TITLE_ROW : MULTIMODULE_OPTIONS_ROW(x))
+
+
+#define BIND_ROWS(x)                   ((IS_MODULE_XJT(x) && !HAS_RF_PROTOCOL_MODELINDEX(g_model.moduleData[x].rfProtocol)) || IS_MODULE_SBUS(x)) ? (uint8_t)1 : (IS_MODULE_PPM(x) || IS_MODULE_PXX(x) || IS_MODULE_DSM2(x) || IS_MODULE_MULTIMODULE(x)) ? (uint8_t)2 : HIDDEN_ROW,
+
+
 #if defined(PCBXLITE) && !defined(MODULE_R9M_FULLSIZE)
-#define EXTERNAL_MODULE_POWER_ROW      (IS_MODULE_MULTIMODULE(EXTERNAL_MODULE) || IS_MODULE_R9M(EXTERNAL_MODULE)) ? (IS_MODULE_R9M_FCC_VARIANT(EXTERNAL_MODULE) ? TITLE_ROW : (uint8_t) 0) : HIDDEN_ROW
+#define MODULE_POWER_ROW(x)      (IS_MODULE_MULTIMODULE(x) || IS_MODULE_R9M(x)) ? (IS_MODULE_R9M_FCC_VARIANT(x) ? TITLE_ROW : (uint8_t) 0) : HIDDEN_ROW
 #else
-#define EXTERNAL_MODULE_POWER_ROW      (IS_MODULE_MULTIMODULE(EXTERNAL_MODULE) || IS_MODULE_R9M(EXTERNAL_MODULE)) ? (uint8_t) 0 : HIDDEN_ROW
+#define MODULE_POWER_ROW(x)      (IS_MODULE_MULTIMODULE(x) || IS_MODULE_R9M(x)) ? (uint8_t) 0 : HIDDEN_ROW
 #endif
 
 void editStickHardwareSettings(coord_t x, coord_t y, int idx, event_t event, LcdFlags flags);

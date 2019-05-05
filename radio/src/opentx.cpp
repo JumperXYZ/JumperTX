@@ -502,8 +502,17 @@ void modelDefault(uint8_t id)
     luaExec(WIZARD_NAME);
   }
 #endif
-
-#if defined(PCBTARANIS) || defined(PCBHORUS)
+#if defined(PCBT16) || defined(PCBT16HD)
+  uint8_t typeInt = MODULE_TYPE_NONE;
+  uint8_t typeExt = MODULE_TYPE_MULTIMODULE;
+#if defined(INTERNAL_MULTIMODULE)
+  std::swap(typeInt, typeExt);
+#endif
+  g_model.moduleData[INTERNAL_MODULE].type = typeInt;
+  g_model.moduleData[INTERNAL_MODULE].channelsCount = DEFAULT_CHANNELS(INTERNAL_MODULE);
+  g_model.moduleData[EXTERNAL_MODULE].type = typeInt;
+  g_model.moduleData[EXTERNAL_MODULE].channelsCount = DEFAULT_CHANNELS(INTERNAL_MODULE);
+#elif defined(PCBTARANIS) || defined(PCBHORUS)
   g_model.moduleData[INTERNAL_MODULE].type = MODULE_TYPE_XJT;
   g_model.moduleData[INTERNAL_MODULE].channelsCount = DEFAULT_CHANNELS(INTERNAL_MODULE);
 #elif defined(PCBSKY9X)

@@ -239,7 +239,6 @@ int getSwitchWarningsCount()
   #define INTERNAL_MODULE_MODE_ROWS       0 // (OFF / RF protocols)
 #endif
 #define IF_EXTERNAL_MODULE_ON(x)          (IS_EXTERNAL_MODULE_ENABLED() ? (uint8_t)(x) : HIDDEN_ROW)
-#define INTERNAL_MODULE_CHANNELS_ROWS     IF_INTERNAL_MODULE_ON(1)
 #define PORT_CHANNELS_ROWS(x)             (x==INTERNAL_MODULE ? INTERNAL_MODULE_CHANNELS_ROWS : (x==EXTERNAL_MODULE ? EXTERNAL_MODULE_CHANNELS_ROWS : 1))
 
 #if defined(BLUETOOTH) && defined(USEHORUSBT)
@@ -295,7 +294,7 @@ void menuModelSetup(event_t event)
     FAILSAFE_ROWS(EXTERNAL_MODULE),
     EXTERNAL_MODULE_OPTION_ROW,
     MULTIMODULE_MODULE_ROWS
-    EXTERNAL_MODULE_POWER_ROW,
+    MODULE_POWER_ROW(EXTERNAL_MODULE),
     LABEL(Trainer), 0, TRAINER_LINE1_ROWS, TRAINER_LINE2_ROWS});
 
   MENU_CHECK(STR_MENUSETUP, menuTabModel, MENU_MODEL_SETUP, ITEM_MODEL_SETUP_MAX);
@@ -675,7 +674,7 @@ void menuModelSetup(event_t event)
         if (attr && s_editMode>0) {
           switch (menuHorizontalPosition) {
             case 0:
-              g_model.moduleData[INTERNAL_MODULE].type = checkIncDec(event, g_model.moduleData[INTERNAL_MODULE].type, MODULE_TYPE_NONE, MODULE_TYPE_XJT, EE_MODEL, isModuleAvailable);
+              g_model.moduleData[INTERNAL_MODULE].type = checkIncDec(event, g_model.moduleData[INTERNAL_MODULE].type, MODULE_TYPE_NONE, MODULE_TYPE_XJT, EE_MODEL, isExternalModuleAvailable);
               if (checkIncDec_Ret) {
                  g_model.moduleData[INTERNAL_MODULE].rfProtocol = 0;
                  g_model.moduleData[INTERNAL_MODULE].channelsStart = 0;
@@ -757,7 +756,7 @@ void menuModelSetup(event_t event)
         if (attr && s_editMode>0) {
           switch (menuHorizontalPosition) {
             case 0:
-              g_model.moduleData[EXTERNAL_MODULE].type = checkIncDec(event, g_model.moduleData[EXTERNAL_MODULE].type, MODULE_TYPE_NONE, IS_TRAINER_EXTERNAL_MODULE() ? MODULE_TYPE_NONE : MODULE_TYPE_COUNT-1, EE_MODEL, isModuleAvailable);
+              g_model.moduleData[EXTERNAL_MODULE].type = checkIncDec(event, g_model.moduleData[EXTERNAL_MODULE].type, MODULE_TYPE_NONE, IS_TRAINER_EXTERNAL_MODULE() ? MODULE_TYPE_NONE : MODULE_TYPE_COUNT-1, EE_MODEL, isExternalModuleAvailable);
               if (checkIncDec_Ret) {
                 g_model.moduleData[EXTERNAL_MODULE].rfProtocol = 0;
                 g_model.moduleData[EXTERNAL_MODULE].channelsStart = 0;

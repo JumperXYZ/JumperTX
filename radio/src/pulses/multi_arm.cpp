@@ -35,20 +35,20 @@ static void sendFrameProtocolHeader(uint8_t port, bool failsafe);
 
 void sendChannels(uint8_t port);
 
-static void sendSetupFrame()
+static void sendSetupFrame(uint8_t port)
 {
   // Old multi firmware will mark config messsages as invalid frame and throw them away
-  sendByteSbus('M');
-  sendByteSbus('P');
-  sendByteSbus(0x80);           // Module Configuration
-  sendByteSbus(1);              // 1 byte data
+  sendByteSbus(port, 'M');
+  sendByteSbus(port, 'P');
+  sendByteSbus(port, 0x80);           // Module Configuration
+  sendByteSbus(port, 1);              // 1 byte data
   uint8_t config = 0x01 | 0x02; // inversion + multi_telemetry
 #if !defined(PPM_PIN_SERIAL)
   // TODO why PPM_PIN_SERIAL would change MULTI protocol?
   config |= 0x04;               // input synchronsisation
 #endif
 
-  sendByteSbus(config);
+  sendByteSbus(port, config);
 }
 
 static void sendFailsafeChannels(uint8_t port)
@@ -79,7 +79,7 @@ static void sendFailsafeChannels(uint8_t port)
     bits |= pulseValue << bitsavailable;
     bitsavailable += MULTI_CHAN_BITS;
     while (bitsavailable >= 8) {
-      sendByteSbus((uint8_t) (bits & 0xff));
+      sendByteSbus(port, (uint8_t) (bits & 0xff));
       bits >>= 8;
       bitsavailable -= 8;
     }
@@ -91,19 +91,19 @@ void setupPulsesMultimodule(uint8_t port)
   static int counter = 0;
 
 #if defined(PPM_PIN_SERIAL)
-  modulePulsesData[EXTERNAL_MODULE].dsm2.serialByte = 0 ;
-  modulePulsesData[EXTERNAL_MODULE].dsm2.serialBitCount = 0 ;
+  modulePulsesData[port].dsm2.serialByte = 0 ;
+  modulePulsesData[port].dsm2.serialBitCount = 0 ;
 #else
-  modulePulsesData[EXTERNAL_MODULE].dsm2.rest = multiSyncStatus.getAdjustedRefreshRate();
-  modulePulsesData[EXTERNAL_MODULE].dsm2.index = 0;
+  modulePulsesData[port].dsm2.rest = multiSyncStatus.getAdjustedRefreshRate();
+  modulePulsesData[port].dsm2.index = 0;
 #endif
 
-  modulePulsesData[EXTERNAL_MODULE].dsm2.ptr = modulePulsesData[EXTERNAL_MODULE].dsm2.pulses;
+  modulePulsesData[port].dsm2.ptr = modulePulsesData[port].dsm2.pulses;
 
   // Every 1000 cycles (=9s) send a config packet that configures the multimodule (inversion, telemetry type)
   counter++;
   if (counter  % 1000== 500) {
-    sendSetupFrame();
+    sendSetupFrame(port);
   } else if (counter % 1000 == 0 && g_model.moduleData[port].failsafeMode != FAILSAFE_NOT_SET && g_model.moduleData[port].failsafeMode != FAILSAFE_RECEIVER) {
     sendFrameProtocolHeader(port, true);
     sendFailsafeChannels(port);
@@ -113,7 +113,7 @@ void setupPulsesMultimodule(uint8_t port)
     sendChannels(port);
   }
 
-  putDsm2Flush();
+  putDsm2Flush(port);
 }
 
 
@@ -136,7 +136,7 @@ void sendChannels(uint8_t port)
     bits |= value << bitsavailable;
     bitsavailable += MULTI_CHAN_BITS;
     while (bitsavailable >= 8) {
-      sendByteSbus((uint8_t) (bits & 0xff));
+      sendByteSbus(port, (uint8_t) (bits & 0xff));
       bits >>= 8;
       bitsavailable -= 8;
     }
@@ -216,9 +216,9 @@ void sendFrameProtocolHeader(uint8_t port, bool failsafe)
 
     // header, byte 0,  0x55 for proto 0-31 0x54 for 32-63
   if (type <= 31)
-    sendByteSbus(headerByte+1);
+    sendByteSbus(port, headerByte+1);
   else
-    sendByteSbus(headerByte);
+    sendByteSbus(port, headerByte);
 
 
   // protocol byte
@@ -226,14 +226,14 @@ void sendFrameProtocolHeader(uint8_t port, bool failsafe)
   if (g_model.moduleData[port].getMultiProtocol(true) != MM_RF_PROTO_DSM2)
     protoByte |= (g_model.moduleData[port].multi.autoBindMode << 6);
 
-  sendByteSbus(protoByte);
+  sendByteSbus(port, protoByte);
 
   // byte 2, subtype, powermode, model id
-  sendByteSbus((uint8_t) ((g_model.header.modelId[port] & 0x0f)
+  sendByteSbus(port, (uint8_t) ((g_model.header.modelId[port] & 0x0f)
                            | ((subtype & 0x7) << 4)
                            | (g_model.moduleData[port].multi.lowPowerMode << 7))
   );
 
   // byte 3
-  sendByteSbus((uint8_t) optionValue);
+  sendByteSbus(port, (uint8_t) optionValue);
 }

@@ -37,12 +37,17 @@ uint8_t getRequiredProtocol(uint8_t port)
   uint8_t required_protocol;
 
   switch (port) {
-#if defined(PCBTARANIS) || defined(PCBHORUS)
+#if defined(PCBTARANIS) || defined(PCBHORUS) || defined(PCBT16) || defined(PCBT16HD)
     case INTERNAL_MODULE:
       switch (g_model.moduleData[INTERNAL_MODULE].type) {
 #if defined(TARANIS_INTERNAL_PPM)
         case MODULE_TYPE_PPM:
           required_protocol = PROTO_PPM;
+          break;
+#endif
+#if defined(INTERNAL_MULTIMODULE)
+        case MODULE_TYPE_MULTIMODULE:
+          required_protocol = PROTO_MULTIMODULE;
           break;
 #endif
         case MODULE_TYPE_XJT:
@@ -118,53 +123,45 @@ uint8_t getRequiredProtocol(uint8_t port)
   return required_protocol;
 }
 
-void setupPulses(uint8_t port)
+
+void disablePort(uint8_t port) {
+  switch (s_current_protocol[port]) { // stop existing protocol hardware
+        case PROTO_PXX:
+          disable_pxx(port);
+          break;
+
+  #if defined(DSM2)
+        case PROTO_DSM2_LP45:
+        case PROTO_DSM2_DSM2:
+        case PROTO_DSM2_DSMX:
+          disable_serial(port);
+          break;
+  #endif
+
+  #if defined(CROSSFIRE)
+        case PROTO_CROSSFIRE:
+          disable_crossfire(port);
+          break;
+  #endif
+
+  #if defined(MULTIMODULE)
+        case PROTO_MULTIMODULE:
+  #endif
+        case PROTO_SBUS:
+          disable_serial(port);
+          break;
+
+        case PROTO_PPM:
+          disable_ppm(port);
+          break;
+
+        default:
+          disable_no_pulses(port);
+          break;
+      }
+}
+void setup(uint8_t port, uint8_t required_protocol, bool init_needed)
 {
-  bool init_needed = false;
-  uint8_t required_protocol = getRequiredProtocol(port);
-
-  heartbeat |= (HEART_TIMER_PULSES << port);
-
-  if (s_current_protocol[port] != required_protocol) {
-    init_needed = true;
-    switch (s_current_protocol[port]) { // stop existing protocol hardware
-      case PROTO_PXX:
-        disable_pxx(port);
-        break;
-
-#if defined(DSM2)
-      case PROTO_DSM2_LP45:
-      case PROTO_DSM2_DSM2:
-      case PROTO_DSM2_DSMX:
-        disable_serial(port);
-        break;
-#endif
-
-#if defined(CROSSFIRE)
-      case PROTO_CROSSFIRE:
-        disable_crossfire(port);
-        break;
-#endif
-
-#if defined(MULTIMODULE)
-      case PROTO_MULTIMODULE:
-#endif
-      case PROTO_SBUS:
-        disable_serial(port);
-        break;
-
-      case PROTO_PPM:
-        disable_ppm(port);
-        break;
-
-      default:
-        disable_no_pulses(port);
-        break;
-    }
-    s_current_protocol[port] = required_protocol;
-  }
-
-  // Set up output data here
   switch (required_protocol) {
     case PROTO_PXX:
       setupPulsesPXX(port);
@@ -226,47 +223,116 @@ void setupPulses(uint8_t port)
     default:
       break;
   }
-
-  if (init_needed) {
-    switch (required_protocol) { // Start new protocol hardware here
-      case PROTO_PXX:
-        init_pxx(port);
-        break;
+}
+void init(uint8_t port, uint8_t required_protocol)
+{
+  switch (required_protocol) { // Start new protocol hardware here
+    case PROTO_PXX:
+      init_pxx(port);
+      break;
 
 #if defined(DSM2)
-      case PROTO_DSM2_LP45:
-      case PROTO_DSM2_DSM2:
-      case PROTO_DSM2_DSMX:
-        init_serial(port, DSM2_BAUDRATE, DSM2_PERIOD * 2000);
-        break;
+    case PROTO_DSM2_LP45:
+    case PROTO_DSM2_DSM2:
+    case PROTO_DSM2_DSMX:
+      init_serial(port, DSM2_BAUDRATE, DSM2_PERIOD * 2000);
+      break;
 #endif
 
 #if defined(CROSSFIRE)
-      case PROTO_CROSSFIRE:
-        init_crossfire(port);
-        break;
+    case PROTO_CROSSFIRE:
+      init_crossfire(port);
+      break;
 #endif
 
 #if defined(MULTIMODULE)
-      case PROTO_MULTIMODULE:
-        init_serial(port, MULTIMODULE_BAUDRATE, MULTIMODULE_PERIOD * 2000);
-        break;
+    case PROTO_MULTIMODULE:
+      init_serial(port, MULTIMODULE_BAUDRATE, MULTIMODULE_PERIOD * 2000);
+      break;
 #endif
 
-      case PROTO_SBUS:
-        init_serial(port, SBUS_BAUDRATE, SBUS_PERIOD_HALF_US);
-        break;
+    case PROTO_SBUS:
+      init_serial(port, SBUS_BAUDRATE, SBUS_PERIOD_HALF_US);
+      break;
 
-      case PROTO_PPM:
-        init_ppm(port);
-        break;
+    case PROTO_PPM:
+      init_ppm(port);
+      break;
 
-      default:
-        init_no_pulses(port);
-        break;
-    }
+    default:
+      init_no_pulses(port);
+      break;
   }
 }
+
+#if defined (SHARED_MODULE_GPIO)
+void setupPulses(uint8_t port)
+{
+  //skip internal module if GPIO is shared
+  if(port != EXTERNAL_MODULE) return;
+  bool init_needed[] = { false, false };
+  uint8_t required_protocol[] = { getRequiredProtocol(INTERNAL_MODULE), getRequiredProtocol(EXTERNAL_MODULE)};
+
+  heartbeat |= (HEART_TIMER_PULSES << EXTERNAL_MODULE);
+  heartbeat |= (HEART_TIMER_PULSES << INTERNAL_MODULE);
+
+  if(required_protocol[0] != PROTO_NONE && required_protocol[1] != PROTO_NONE)
+  {
+    //ignore internal if both enabled
+    required_protocol[0] = PROTO_NONE;
+  }
+
+  for (port = INTERNAL_MODULE; port <= EXTERNAL_MODULE; port++)
+  {
+
+    if (s_current_protocol[port] != required_protocol[port])
+    {
+      init_needed[port] = true;
+      disablePort(port);
+      s_current_protocol[port] = required_protocol[port];
+    }
+    // Set up output data here
+    setup(port, required_protocol[port], init_needed[port]);
+
+  }
+
+  //Single module can be active at once
+
+  if(init_needed[INTERNAL_MODULE] && required_protocol[INTERNAL_MODULE] != PROTO_NONE)
+  {
+    init(INTERNAL_MODULE, required_protocol[INTERNAL_MODULE]);
+  }
+  else if(init_needed[EXTERNAL_MODULE] && required_protocol[EXTERNAL_MODULE] != PROTO_NONE)
+  {
+    init(EXTERNAL_MODULE, required_protocol[EXTERNAL_MODULE]);
+  }
+  else if(init_needed[INTERNAL_MODULE] || init_needed[EXTERNAL_MODULE])
+  {
+    init_no_pulses(EXTERNAL_MODULE);
+  }
+}
+#else
+void setupPulses(uint8_t port)
+{
+  bool init_needed = false;
+  uint8_t required_protocol = getRequiredProtocol(port);
+
+  heartbeat |= (HEART_TIMER_PULSES << port);
+
+  if (s_current_protocol[port] != required_protocol) {
+    init_needed = true;
+    disablePort(port);
+    s_current_protocol[port] = required_protocol;
+  }
+
+  // Set up output data here
+  setup(port, required_protocol, init_needed);
+
+  if (init_needed) {
+    init(port, required_protocol);
+  }
+}
+#endif
 
 void setCustomFailsafe(uint8_t moduleIndex)
 {

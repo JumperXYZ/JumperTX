@@ -53,9 +53,16 @@ enum MultiBufferState : uint8_t {
 
 MultiBufferState guessProtocol()
 {
-  if (g_model.moduleData[EXTERNAL_MODULE].getMultiProtocol(false) == MM_RF_PROTO_DSM2)
+  uint32_t port = EXTERNAL_MODULE;
+#if defined(INTERNAL_MULTIMODULE)
+  if (IS_MODULE_MULTIMODULE(INTERNAL_MODULE)) {
+    port = INTERNAL_MODULE;
+  }
+#endif
+
+  if (g_model.moduleData[port].getMultiProtocol(false) == MM_RF_PROTO_DSM2)
     return SpektrumTelemetryFallback;
-  else if (g_model.moduleData[EXTERNAL_MODULE].getMultiProtocol(false) == MM_RF_PROTO_FS_AFHDS2A)
+  else if (g_model.moduleData[port].getMultiProtocol(false) == MM_RF_PROTO_FS_AFHDS2A)
     return FlyskyTelemetryFallback;
   else
     return FrskyTelemetryFallback;
@@ -285,9 +292,11 @@ void MultiModuleStatus::getStatusString(char *statusText)
 {
   if (!isValid()) {
 #if defined(PCBTARANIS) || defined(PCBHORUS)
+#if !defined(INTERNAL_MULTIMODULE)
     if (IS_INTERNAL_MODULE_ENABLED())
       strcpy(statusText, STR_DISABLE_INTERNAL);
     else
+#endif
 #endif
       strcpy(statusText, STR_MODULE_NO_TELEMETRY);
     return;
