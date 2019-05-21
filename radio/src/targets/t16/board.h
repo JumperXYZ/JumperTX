@@ -533,6 +533,10 @@ void sportSendBuffer(uint8_t * buffer, uint32_t count);
 uint8_t telemetryGetByte(uint8_t * byte);
 extern uint32_t telemetryErrors;
 
+#if defined(INTERNAL_MULTIMODULE)
+uint8_t intTelemetrGetByte(uint8_t * byte);
+#endif
+
 // Sport update driver
 #if defined(PCBT16)
 void sportUpdatePowerOn(void);

@@ -741,14 +741,6 @@ bool menuModelSetup(event_t event)
                 if(IS_MODULE_PPM(moduleIdx))
                   SET_DEFAULT_PPM_FRAME_LENGTH(moduleIdx);
               }
-#if defined(SHARED_MODULE_GPIO)
-              if(g_model.moduleData[moduleIdx].type != MODULE_TYPE_NONE) {
-                g_model.moduleData[!moduleIdx].type = MODULE_TYPE_NONE;
-                g_model.moduleData[!moduleIdx].channelsStart = 0;
-                g_model.moduleData[!moduleIdx].channelsCount = DEFAULT_CHANNELS(!moduleIdx);
-              }
-#endif
-
               break;
             }
             case 1:

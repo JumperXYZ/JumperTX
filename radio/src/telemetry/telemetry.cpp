@@ -105,6 +105,15 @@ void telemetryWakeup()
       LOG_TELEMETRY_WRITE_BYTE(data);
     } while (telemetryGetByte(&data));
   }
+#if defined(INTERNAL_MULTIMODULE)
+  if (g_model.moduleData[INTERNAL_MODULE].type == MODULE_TYPE_MULTIMODULE && intTelemetrGetByte(&data)) {
+    LOG_TELEMETRY_WRITE_START();
+    do {
+      processMultiTelemetryData(data);
+      LOG_TELEMETRY_WRITE_BYTE(data);
+    } while (intTelemetrGetByte(&data));
+  }
+#endif
 #elif defined(PCBSKY9X)
   if (telemetryProtocol == PROTOCOL_FRSKY_D_SECONDARY) {
     uint8_t data;
