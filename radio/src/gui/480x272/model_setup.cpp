@@ -951,8 +951,8 @@ bool menuModelSetup(event_t event)
             drawButton(MODEL_SETUP_2ND_COLUMN+MODEL_SETUP_RANGE_OFS+xOffsetBind, y, STR_MODULE_RANGE, (moduleFlag[moduleIdx] == MODULE_RANGECHECK ? BUTTON_ON : BUTTON_OFF) | (l_posHorz==2 ? attr : 0));
             uint8_t newFlag = 0;
 #if defined(MULTIMODULE)
-            if (multiBindStatus == MULTI_BIND_FINISHED) {
-              multiBindStatus = MULTI_NORMAL_OPERATION;
+            if (multiBindStatus[moduleIdx] == MULTI_BIND_FINISHED) {
+              multiBindStatus[moduleIdx] = MULTI_NORMAL_OPERATION;
               s_editMode = 0;
             }
 #endif
@@ -1005,7 +1005,7 @@ bool menuModelSetup(event_t event)
             moduleFlag[moduleIdx] = newFlag;
 #if defined(MULTIMODULE)
             if (newFlag == MODULE_BIND)
-              multiBindStatus = MULTI_BIND_INITIATED;
+              multiBindStatus[moduleIdx] = MULTI_BIND_INITIATED;
 #endif
           }
         }

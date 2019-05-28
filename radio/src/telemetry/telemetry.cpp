@@ -66,15 +66,15 @@ void processTelemetryData(uint8_t data)
 #endif
 #if defined(MULTIMODULE)
   if (telemetryProtocol == PROTOCOL_SPEKTRUM) {
-    processSpektrumTelemetryData(data);
+    processSpektrumTelemetryData(data, EXTERNAL_MODULE, telemetryRxBuffer, &telemetryRxBufferCount);
     return;
   }
   if (telemetryProtocol == PROTOCOL_FLYSKY_IBUS) {
-    processFlySkyTelemetryData(data);
+    processFlySkyTelemetryData(data, telemetryRxBuffer, &telemetryRxBufferCount);
     return;
   }
   if (telemetryProtocol == PROTOCOL_MULTIMODULE) {
-    processMultiTelemetryData(data);
+    processMultiTelemetryData(data, EXTERNAL_MODULE);
     return;
   }
 #endif
@@ -106,10 +106,13 @@ void telemetryWakeup()
     } while (telemetryGetByte(&data));
   }
 #if defined(INTERNAL_MULTIMODULE)
+  //internal module use own pooling loop
+  //we could do it in module driver but maybe this should be separated RTOS task
+  //it is more safe to keep it here for the time being
   if (g_model.moduleData[INTERNAL_MODULE].type == MODULE_TYPE_MULTIMODULE && intTelemetrGetByte(&data)) {
     LOG_TELEMETRY_WRITE_START();
     do {
-      processMultiTelemetryData(data);
+      processMultiTelemetryData(data, INTERNAL_MODULE);
       LOG_TELEMETRY_WRITE_BYTE(data);
     } while (intTelemetrGetByte(&data));
   }

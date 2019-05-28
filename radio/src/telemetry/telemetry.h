@@ -80,6 +80,8 @@ extern uint8_t telemetryState;
 extern uint8_t telemetryRxBuffer[TELEMETRY_RX_PACKET_SIZE];
 extern uint8_t telemetryRxBufferCount;
 
+
+
 #if defined(CPUARM)
 #define TELEMETRY_AVERAGE_COUNT        3
 
@@ -142,25 +144,25 @@ extern uint8_t telemetryProtocol;
 #if defined(CPUARM)
 inline uint8_t modelTelemetryProtocol()
 {
+  bool internalModuleInUse = IS_INTERNAL_MODULE_ENABLED();
+#if defined(INTERNAL_MULTIMODULE)
+  //internal muli module is not conflicting with external one
+  internalModuleInUse = false;
+#endif
 #if defined(CROSSFIRE)
   if (g_model.moduleData[EXTERNAL_MODULE].type == MODULE_TYPE_CROSSFIRE) {
     return PROTOCOL_PULSES_CROSSFIRE;
   }
 #endif
      
-  if (!IS_INTERNAL_MODULE_ENABLED() && g_model.moduleData[EXTERNAL_MODULE].type == MODULE_TYPE_PPM) {
+  if (!internalModuleInUse && g_model.moduleData[EXTERNAL_MODULE].type == MODULE_TYPE_PPM) {
     return g_model.telemetryProtocol;
   }
   
 #if defined(MULTIMODULE)
-  if (!IS_INTERNAL_MODULE_ENABLED() && g_model.moduleData[EXTERNAL_MODULE].type == MODULE_TYPE_MULTIMODULE) {
+  if (!internalModuleInUse && g_model.moduleData[EXTERNAL_MODULE].type == MODULE_TYPE_MULTIMODULE) {
     return PROTOCOL_MULTIMODULE;
   }
-#if defined(INTERNAL_MULTIMODULE)
-  if (g_model.moduleData[INTERNAL_MODULE].type == MODULE_TYPE_MULTIMODULE) {
-    return PROTOCOL_MULTIMODULE;
-  }
-#endif
 #endif
   // default choice
   return PROTOCOL_FRSKY_SPORT;
