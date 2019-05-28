@@ -48,17 +48,14 @@ enum MultiBufferState : uint8_t {
 
 //implement getters by port
 
-MultiModuleStatus multiModuleStatus;
-MultiModuleSyncStatus multiSyncStatus;
+MultiModuleStatus multiModuleStatus[NUM_MODULES] = {MultiModuleStatus(), MultiModuleStatus()};
+MultiModuleSyncStatus multiSyncStatus[NUM_MODULES] = {MultiModuleSyncStatus(), MultiModuleSyncStatus()};
 uint8_t multiBindStatus[NUM_MODULES] = { MULTI_NORMAL_OPERATION, MULTI_NORMAL_OPERATION };
 
 static MultiBufferState multiTelemetryBufferState[NUM_MODULES];
 #if defined(INTERNAL_MULTIMODULE)
 uint8_t intTelemetryRxBuffer[TELEMETRY_RX_PACKET_SIZE];
 uint8_t intTelemetryRxBufferCount;
-
-MultiModuleStatus intMultiModuleStatus;
-MultiModuleSyncStatus intMultiSyncStatus;
 #endif
 
 
@@ -78,45 +75,36 @@ MultiBufferState guessProtocol(uint8_t port)
 
 static void processMultiStatusPacket(const uint8_t *data, uint8_t port)
 {
-  MultiModuleStatus* status = &multiModuleStatus;
-#if defined(INTERNAL_MULTIMODULE)
-  if(port == INTERNAL_MODULE) status = &intMultiModuleStatus;
-#endif
-
   // At least two status packets without bind flag
-  bool wasBinding = ((*status).isBinding());
+  bool wasBinding = (multiModuleStatus[port].isBinding());
 
-  (*status).flags = data[0];
-  (*status).major = data[1];
-  (*status).minor = data[2];
-  (*status).revision = data[3];
-  (*status).patch = data[4];
-  (*status).lastUpdate = get_tmr10ms();
+  multiModuleStatus[port].flags = data[0];
+  multiModuleStatus[port].major = data[1];
+  multiModuleStatus[port].minor = data[2];
+  multiModuleStatus[port].revision = data[3];
+  multiModuleStatus[port].patch = data[4];
+  multiModuleStatus[port].lastUpdate = get_tmr10ms();
 
-  if (wasBinding && !(*status).isBinding() && multiBindStatus[port] == MULTI_BIND_INITIATED)
+  if (wasBinding && !multiModuleStatus[port].isBinding() && multiBindStatus[port] == MULTI_BIND_INITIATED)
     multiBindStatus[port] = MULTI_BIND_FINISHED;
 }
 
 static void processMultiSyncPacket(const uint8_t *data, uint8_t port)
 {
-  MultiModuleSyncStatus *syncStatus = &multiSyncStatus;
-#if defined(INTERNAL_MULTIMODULE)
-  if(port == INTERNAL_MODULE) syncStatus = &intMultiSyncStatus;
-#endif
-  (*syncStatus).lastUpdate = get_tmr10ms();
-  (*syncStatus).interval = data[4];
-  (*syncStatus).target = data[5];
+  multiSyncStatus[port].lastUpdate = get_tmr10ms();
+  multiSyncStatus[port].interval = data[4];
+  multiSyncStatus[port].target = data[5];
 #if !defined(PPM_PIN_SERIAL)
-  auto oldlag = (*syncStatus).inputLag;
+  auto oldlag = multiSyncStatus[port].inputLag;
   (void) oldlag;
 #endif
 
-  (*syncStatus).calcAdjustedRefreshRate(data[0] << 8 | data[1], data[2] << 8 | data[3]);
+  multiSyncStatus[port].calcAdjustedRefreshRate(data[0] << 8 | data[1], data[2] << 8 | data[3]);
 
 #if !defined(PPM_PIN_SERIAL)
   TRACE("MP ADJ: rest: %d, lag %04d, diff: %04d  target: %d, interval: %d, Refresh: %d, intAdjRefresh: %d, adjRefresh %d\r\n", modulePulsesData[port].dsm2.rest,
-      (*syncStatus).inputLag, oldlag-multiSyncStatus.inputLag, (*syncStatus).target, (*syncStatus).interval, (*syncStatus).refreshRate, (*syncStatus).adjustedRefreshRate/50,
-      (*syncStatus).getAdjustedRefreshRate());
+      multiSyncStatus[port].inputLag, oldlag-multiSyncStatus[port].inputLag, multiSyncStatus[port].target, multiSyncStatus[port].interval, multiSyncStatus[port].refreshRate, multiSyncStatus[port].adjustedRefreshRate/50,
+      multiSyncStatus[port].getAdjustedRefreshRate());
 #endif
 }
 

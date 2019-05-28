@@ -1145,7 +1145,7 @@ bool menuModelSetup(event_t event)
       lcdDrawText(MENUS_MARGIN_LEFT, y, STR_MODULE_STATUS);
 
       char statusText[64];
-      multiModuleStatus.getStatusString(statusText);
+      multiModuleStatus[moduleIdx].getStatusString(statusText);
       lcdDrawText(MODEL_SETUP_2ND_COLUMN, y, statusText);
       break;
     }
@@ -1155,7 +1155,7 @@ bool menuModelSetup(event_t event)
       lcdDrawText(MENUS_MARGIN_LEFT, y, STR_MODULE_SYNC);
 
       char statusText[64];
-      multiSyncStatus.getRefreshString(statusText);
+      multiSyncStatus[moduleIdx].getRefreshString(statusText);
       lcdDrawText(MODEL_SETUP_2ND_COLUMN, y, statusText);
       break;
     }

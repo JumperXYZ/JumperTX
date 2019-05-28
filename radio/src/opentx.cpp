@@ -1917,7 +1917,7 @@ void doMixerCalculations()
     static uint8_t countRangecheck = 0;
     for (uint8_t i=0; i<NUM_MODULES; ++i) {
 #if defined(MULTIMODULE)
-      if (moduleFlag[i] != MODULE_NORMAL_MODE || (i == EXTERNAL_MODULE && multiModuleStatus.isBinding())) {
+      if (moduleFlag[i] != MODULE_NORMAL_MODE || multiModuleStatus[i].isBinding()) {
 #else
       if (moduleFlag[i] != MODULE_NORMAL_MODE) {
 #endif

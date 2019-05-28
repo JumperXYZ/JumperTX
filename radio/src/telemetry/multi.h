@@ -107,7 +107,7 @@ struct MultiModuleSyncStatus {
 
 };
 
-extern MultiModuleSyncStatus multiSyncStatus;
+extern MultiModuleSyncStatus multiSyncStatus[];
 
 
 struct MultiModuleStatus {

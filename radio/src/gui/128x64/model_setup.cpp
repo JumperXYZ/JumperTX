@@ -1380,7 +1380,7 @@ void menuModelSetup(event_t event)
         lcdDrawTextAlignedLeft(y, STR_MODULE_STATUS);
 
         char statusText[64];
-        multiModuleStatus.getStatusString(statusText);
+        multiModuleStatus[EXTERNAL_MODULE].getStatusString(statusText);
         lcdDrawText(MODEL_SETUP_2ND_COLUMN, y, statusText);
         break;
       }
@@ -1389,7 +1389,7 @@ void menuModelSetup(event_t event)
         lcdDrawTextAlignedLeft(y, STR_MODULE_SYNC);
 
         char statusText[64];
-        multiSyncStatus.getRefreshString(statusText);
+        multiSyncStatus[EXTERNAL_MODULE].getRefreshString(statusText);
         lcdDrawText(MODEL_SETUP_2ND_COLUMN, y, statusText);
         break;
       }

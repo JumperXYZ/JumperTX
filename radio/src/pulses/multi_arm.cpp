@@ -105,7 +105,7 @@ void setupPulsesMultimodule(uint8_t port)
   modulePulsesData[port].dsm2.serialByte = 0 ;
   modulePulsesData[port].dsm2.serialBitCount = 0 ;
 #else
-  modulePulsesData[port].dsm2.rest = multiSyncStatus.getAdjustedRefreshRate();
+  modulePulsesData[port].dsm2.rest = multiSyncStatus[port].getAdjustedRefreshRate();
   modulePulsesData[port].dsm2.index = 0;
 #endif
   modulePulsesData[port].dsm2.ptr = modulePulsesData[port].dsm2.pulses;
