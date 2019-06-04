@@ -404,7 +404,7 @@ void memswap(void * a, void * b, uint8_t size);
 
 
 #if defined(MULTIMODULE)
-  #define IS_MODULE_MULTIMODULE(idx)        (idx==EXTERNAL_MODULE && g_model.moduleData[EXTERNAL_MODULE].type==MODULE_TYPE_MULTIMODULE)
+  #define IS_MODULE_MULTIMODULE(idx)        (g_model.moduleData[idx].type==MODULE_TYPE_MULTIMODULE)
 #else
   #define IS_MODULE_MULTIMODULE(idx)        (false)
 #endif

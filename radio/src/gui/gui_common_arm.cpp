@@ -500,7 +500,15 @@ bool isR9MModeAvailable(int mode)
 #endif
 }
 
-bool isModuleAvailable(int module)
+bool isInternalModuleAvailable(int module) {
+  bool result = module == MODULE_TYPE_NONE;
+#if defined(INTERNAL_MULTIMODULE)
+  result |= module == MODULE_TYPE_MULTIMODULE;
+#endif
+  return result;
+}
+
+bool isExternalModuleAvailable(int module)
 {
 #if defined(CROSSFIRE)
   if (module == MODULE_TYPE_CROSSFIRE && g_model.moduleData[INTERNAL_MODULE].type != MODULE_TYPE_NONE) {

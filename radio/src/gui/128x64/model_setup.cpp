@@ -159,7 +159,6 @@ enum MenuModelSetupItems {
 #endif
   #define IF_INTERNAL_MODULE_ON(x)       (IS_INTERNAL_MODULE_ENABLED()? (uint8_t)(x) : HIDDEN_ROW )
   #define IF_EXTERNAL_MODULE_ON(x)       (IS_EXTERNAL_MODULE_ENABLED()? (uint8_t)(x) : HIDDEN_ROW)
-  #define INTERNAL_MODULE_CHANNELS_ROWS  IF_INTERNAL_MODULE_ON(1)
   #define EXTERNAL_MODULE_BIND_ROWS()    ((IS_MODULE_XJT(EXTERNAL_MODULE) && IS_D8_RX(EXTERNAL_MODULE)) || IS_MODULE_SBUS(EXTERNAL_MODULE)) ? (uint8_t)1 : (IS_MODULE_PPM(EXTERNAL_MODULE) || IS_MODULE_PXX(EXTERNAL_MODULE) || IS_MODULE_DSM2(EXTERNAL_MODULE) || IS_MODULE_MULTIMODULE(EXTERNAL_MODULE)) ? (uint8_t)2 : HIDDEN_ROW
 
 #if defined(PCBSKY9X) && defined(REVX)
@@ -286,13 +285,13 @@ void menuModelSetup(event_t event)
     LABEL(ExternalModule),
     EXTERNAL_MODULE_MODE_ROWS,
     MULTIMODULE_SUBTYPE_ROWS(EXTERNAL_MODULE)
-    MULTIMODULE_STATUS_ROWS
+    MULTIMODULE_STATUS_ROWS(EXTERNAL_MODULE)
     EXTERNAL_MODULE_CHANNELS_ROWS,
     EXTERNAL_MODULE_BIND_ROWS(),
     OUTPUT_TYPE_ROWS()
-    EXTERNAL_MODULE_OPTION_ROW,
-    MULTIMODULE_MODULE_ROWS
-    EXTERNAL_MODULE_POWER_ROW,
+    MODULE_OPTION_ROW(EXTERNAL_MODULE),
+    MULTIMODULE_MODULE_ROWS(EXTERNAL_MODULE)  //AUTOBIND might be empty comma added in macro
+    MODULE_POWER_ROW(EXTERNAL_MODULE),
     EXTRA_MODULE_ROWS
     FAILSAFE_ROWS(EXTERNAL_MODULE),
     TRAINER_ROWS });
@@ -301,13 +300,13 @@ void menuModelSetup(event_t event)
     LABEL(ExternalModule),
     EXTERNAL_MODULE_MODE_ROWS,
     MULTIMODULE_SUBTYPE_ROWS(EXTERNAL_MODULE)
-    MULTIMODULE_STATUS_ROWS
+    MULTIMODULE_STATUS_ROWS(EXTERNAL_MODULE)
     EXTERNAL_MODULE_CHANNELS_ROWS,
     EXTERNAL_MODULE_BIND_ROWS(),
     OUTPUT_TYPE_ROWS()
-    EXTERNAL_MODULE_OPTION_ROW,
-    MULTIMODULE_MODULE_ROWS
-    EXTERNAL_MODULE_POWER_ROW,
+    MODULE_OPTION_ROW(EXTERNAL_MODULE),
+    MULTIMODULE_MODULE_ROWS(EXTERNAL_MODULE)
+    MODULE_POWER_ROW(EXTERNAL_MODULE),
     EXTRA_MODULE_ROWS
     FAILSAFE_ROWS(EXTERNAL_MODULE),
     TRAINER_ROWS });
@@ -857,7 +856,7 @@ void menuModelSetup(event_t event)
         if (attr && (editMode>0 || p1valdiff)) {
           switch (menuHorizontalPosition) {
             case 0:
-              g_model.moduleData[EXTERNAL_MODULE].type = checkIncDec(event, g_model.moduleData[EXTERNAL_MODULE].type, MODULE_TYPE_NONE, IS_TRAINER_EXTERNAL_MODULE() ? MODULE_TYPE_NONE : MODULE_TYPE_COUNT-1, EE_MODEL, isModuleAvailable);
+              g_model.moduleData[EXTERNAL_MODULE].type = checkIncDec(event, g_model.moduleData[EXTERNAL_MODULE].type, MODULE_TYPE_NONE, IS_TRAINER_EXTERNAL_MODULE() ? MODULE_TYPE_NONE : MODULE_TYPE_COUNT-1, EE_MODEL, isExternalModuleAvailable);
               if (checkIncDec_Ret) {
                 g_model.moduleData[EXTERNAL_MODULE].rfProtocol = 0;
                 g_model.moduleData[EXTERNAL_MODULE].channelsStart = 0;
@@ -1137,8 +1136,8 @@ void menuModelSetup(event_t event)
             lcdDrawText(MODEL_SETUP_2ND_COLUMN+MODEL_SETUP_RANGE_OFS+xOffsetBind, y, STR_MODULE_RANGE, l_posHorz==2 ? attr : 0);
             uint8_t newFlag = 0;
 #if defined(MULTIMODULE)
-            if (multiBindStatus == MULTI_BIND_FINISHED) {
-              multiBindStatus = MULTI_NORMAL_OPERATION;
+            if (multiBindStatus[EXTERNAL_MODULE] == MULTI_BIND_FINISHED) {
+              multiBindStatus[EXTERNAL_MODULE] = MULTI_NORMAL_OPERATION;
               s_editMode = 0;
             }
 #endif
@@ -1208,7 +1207,7 @@ void menuModelSetup(event_t event)
 
 #if defined(MULTIMODULE)
             if (newFlag == MODULE_BIND) {
-              multiBindStatus = MULTI_BIND_INITIATED;
+              multiBindStatus[EXTERNAL_MODULE] = MULTI_BIND_INITIATED;
             }
 #endif
 
@@ -1381,7 +1380,7 @@ void menuModelSetup(event_t event)
         lcdDrawTextAlignedLeft(y, STR_MODULE_STATUS);
 
         char statusText[64];
-        multiModuleStatus.getStatusString(statusText);
+        multiModuleStatus[EXTERNAL_MODULE].getStatusString(statusText);
         lcdDrawText(MODEL_SETUP_2ND_COLUMN, y, statusText);
         break;
       }
@@ -1390,7 +1389,7 @@ void menuModelSetup(event_t event)
         lcdDrawTextAlignedLeft(y, STR_MODULE_SYNC);
 
         char statusText[64];
-        multiSyncStatus.getRefreshString(statusText);
+        multiSyncStatus[EXTERNAL_MODULE].getRefreshString(statusText);
         lcdDrawText(MODEL_SETUP_2ND_COLUMN, y, statusText);
         break;
       }
