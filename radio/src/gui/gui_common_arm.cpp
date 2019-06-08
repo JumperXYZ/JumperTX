@@ -694,7 +694,7 @@ const pm_char STR_SUBTYPE_H83D[] PROGMEM =       "\007""Std\0   ""H20H\0  ""H20M
 const pm_char STR_SUBTYPE_CORONA[] PROGMEM =     "\006"" V1\0  "" V2\0  "" FD V3";
 const pm_char STR_SUBTYPE_HITEC[] PROGMEM =      "\007""Optima\0""Opt Hub""Minima\0";
 const pm_char STR_SUBTYPE_E01X[] PROGMEM =       "\005""E012\0""E015\0""E016H";
-const pm_char STR_SUBTYPE_GD00X[] PROGMEM =      "\002""V1""V2";
+const pm_char STR_SUBTYPE_GD00X[] PROGMEM =      "\005""GD_V1""GD_V2";
 const pm_char STR_SUBTYPE_BUGS_MINI[] PROGMEM =  "\006""Std\0  ""BUGS3H";
 
 const mm_protocol_definition multi_protocols[] = {
@@ -727,7 +727,9 @@ const mm_protocol_definition multi_protocols[] = {
   {MM_RF_PROTO_CORONA,     2, false,      STR_SUBTYPE_CORONA,  STR_MULTI_RFTUNE},
   {MM_RF_PROTO_HITEC,      2, false,      STR_SUBTYPE_HITEC,   STR_MULTI_RFTUNE},
   {MM_RF_PROTO_E01X,       2, false,      STR_SUBTYPE_E01X,    nullptr},
-  {MM_RF_PROTO_GD00X,      1, false,      STR_SUBTYPE_GD00X,   nullptr},
+  {MM_RF_PROTO_GD00X,      1, false,      STR_SUBTYPE_GD00X,   STR_MULTI_RFTUNE},
+  {MM_RF_PROTO_KF606,      0, false,      NO_SUBTYPE,          STR_MULTI_RFTUNE},
+  {MM_RF_PROTO_V911S,      0, false,      NO_SUBTYPE,          STR_MULTI_RFTUNE},
   {MM_RF_PROTO_BUGS_MINI,  1, false,      STR_SUBTYPE_BUGS_MINI,nullptr},
   {MM_RF_CUSTOM_SELECTED,  7, true,       NO_SUBTYPE,          STR_MULTI_OPTION},
 
