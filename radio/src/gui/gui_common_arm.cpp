@@ -696,6 +696,7 @@ const pm_char STR_SUBTYPE_HITEC[] PROGMEM =      "\007""Optima\0""Opt Hub""Minim
 const pm_char STR_SUBTYPE_E01X[] PROGMEM =       "\005""E012\0""E015\0""E016H";
 const pm_char STR_SUBTYPE_GD00X[] PROGMEM =      "\005""GD_V1""GD_V2";
 const pm_char STR_SUBTYPE_BUGS_MINI[] PROGMEM =  "\006""Std\0  ""BUGS3H";
+const pm_char STR_SUBTYPE_DEVO[] PROGMEM =       "\004""8CH\0""10CH""12CH""6CH\0""7CH\0";
 
 const mm_protocol_definition multi_protocols[] = {
 
@@ -705,6 +706,7 @@ const mm_protocol_definition multi_protocols[] = {
   {MM_RF_PROTO_HISKY,      1, false,      STR_SUBTYPE_HISKY,   nullptr},
   {MM_RF_PROTO_V2X2,       1, false,      STR_SUBTYPE_V2X2,    nullptr},
   {MM_RF_PROTO_DSM2,       3, false,      STR_SUBTYPE_DSM,     nullptr},
+  {MM_RF_PROTO_DEVO,       4, false,      STR_SUBTYPE_DEVO,    STR_MULTI_FIXEDID},
   {MM_RF_PROTO_YD717,      4, false,      STR_SUBTYPE_YD717,   nullptr},
   {MM_RF_PROTO_KN,         1, false,      STR_SUBTYPE_KN,      nullptr},
   {MM_RF_PROTO_SYMAX,      1, false,      STR_SUBTYPE_SYMAX,   nullptr},
