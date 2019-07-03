@@ -148,6 +148,7 @@ inline uint8_t modelTelemetryProtocol()
 #if defined(INTERNAL_MULTIMODULE)
   //internal muli module is not conflicting with external one
   internalModuleInUse = false;
+	  return PROTOCOL_MULTIMODULE;
 #endif
 #if defined(CROSSFIRE)
   if (g_model.moduleData[EXTERNAL_MODULE].type == MODULE_TYPE_CROSSFIRE) {
