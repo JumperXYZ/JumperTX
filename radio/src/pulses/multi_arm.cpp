@@ -37,7 +37,9 @@ void sendChannels(uint8_t port);
 
 void sendMulti(uint8_t port, uint8_t b) {
   if(port == INTERNAL_MODULE){
-    *modulePulsesData[port].pxx_uart.ptr++ = b;
+    #if defined(INTMODULE_USART) || defined(EXTMODULE_USART)
+      *modulePulsesData[port].pxx_uart.ptr++ = b;
+    #endif
   }
   else sendByteSbus(port, b);
 }
@@ -98,7 +100,9 @@ void setupPulsesMultimodule(uint8_t port)
   static int counter = 0;
   if(port == INTERNAL_MODULE)
   {
-    modulePulsesData[port].pxx_uart.ptr = modulePulsesData[port].pxx_uart.pulses;
+    #if defined(INTMODULE_USART) || defined(EXTMODULE_USART)
+      modulePulsesData[port].pxx_uart.ptr = modulePulsesData[port].pxx_uart.pulses;
+    #endif
   }
   else{
 #if defined(PPM_PIN_SERIAL)
