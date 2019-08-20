@@ -695,7 +695,7 @@ const pm_char STR_SUBTYPE_CORONA[] PROGMEM =     "\006"" V1\0  "" V2\0  "" FD V3
 const pm_char STR_SUBTYPE_HITEC[] PROGMEM =      "\007""Optima\0""Opt Hub""Minima\0";
 const pm_char STR_SUBTYPE_E01X[] PROGMEM =       "\005""E012\0""E015\0""E016H";
 const pm_char STR_SUBTYPE_GD00X[] PROGMEM =      "\005""GD_V1""GD_V2";
-const pm_char STR_SUBTYPE_REDPINE[] PROGMEM =    "\004""FAST""SLOW";
+const pm_char STR_SUBTYPE_REDPINE[] PROGMEM =    "\004""Fast""Slow";
 const pm_char STR_SUBTYPE_BUGS_MINI[] PROGMEM =  "\006""Std\0  ""BUGS3H";
 const pm_char STR_SUBTYPE_DEVO[] PROGMEM =       "\004""8CH\0""10CH""12CH""6CH\0""7CH\0";
 
