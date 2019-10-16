@@ -47,6 +47,8 @@ add_definitions(-DEEPROM_VARIANT=0 -DAUDIO -DVOICE -DRTCLOCK)
 add_definitions(-DGPS_USART_BAUDRATE=${INTERNAL_GPS_BAUDRATE})
 add_definitions(-DPWR_BUTTON_${PWR_BUTTON})
 
+add_definitions(-DINTERNAL_MULTIMODULE)
+
 if(NOT UNEXPECTED_SHUTDOWN)
   add_definitions(-DNO_UNEXPECTED_SHUTDOWN)
 endif()
@@ -99,7 +101,7 @@ set(TARGET_SRC
   led_driver.cpp
   extmodule_driver.cpp
   trainer_driver.cpp
-  ../common/arm/stm32/intmodule_serial_driver.cpp
+  intmodule_serial_driver.cpp
   ../common/arm/stm32/bluetooth_driver.cpp
   )
 

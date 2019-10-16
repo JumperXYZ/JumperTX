@@ -124,6 +124,10 @@ void delay_ms(uint32_t ms);
 #define IS_HORUS_PROD()                GPIO_ReadInputDataBit(PCBREV_GPIO, PCBREV_GPIO_PIN)
 #if defined(SIMU) || defined(PCBT16HD)
   #define IS_FIRMWARE_COMPATIBLE_WITH_BOARD() true
+#elif PCBREV >= 13
+  #define IS_FIRMWARE_COMPATIBLE_WITH_BOARD() IS_HORUS_PROD()
+#else
+  #define IS_FIRMWARE_COMPATIBLE_WITH_BOARD() (!IS_HORUS_PROD())
 #endif
 
 // CPU Unique ID
@@ -497,6 +501,9 @@ void sportSendBuffer(uint8_t * buffer, uint32_t count);
 uint8_t telemetryGetByte(uint8_t * byte);
 extern uint32_t telemetryErrors;
 
+#if defined(INTERNAL_MULTIMODULE)
+uint8_t intTelemetrGetByte(uint8_t * byte);
+#endif
 // Sport update driver
 
 void sportUpdatePowerOn(void);
@@ -546,6 +553,7 @@ void checkTrainerSettings(void);
 #include "dmafifo.h"
 extern DMAFifo<512> telemetryFifo;
 extern DMAFifo<32> serial2RxFifo;
+extern volatile uint32_t externalModulePort;
 #endif
 
 

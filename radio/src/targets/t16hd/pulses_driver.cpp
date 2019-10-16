@@ -24,7 +24,7 @@ void intmoduleStop(void);
 void extmoduleStop(void);
 
 void intmoduleNoneStart(void);
-void intmodulePxxStart(void);
+void intmoduleSerialStart(uint32_t baudrate, uint32_t period_half_us);
 
 void extmoduleNoneStart(void);
 void extmodulePpmStart(void);
@@ -64,23 +64,22 @@ void disable_ppm(uint32_t port)
 
 void init_pxx(uint32_t port)
 {
-  if (port == INTERNAL_MODULE)
-    intmodulePxxStart();
-  else
+  if (port == EXTERNAL_MODULE)
     extmodulePxxStart();
 }
 
 void disable_pxx(uint32_t port)
 {
-  if (port == INTERNAL_MODULE)
-    intmoduleStop();
-  else
+  if (port == EXTERNAL_MODULE)
     extmoduleStop();
 }
 
 #if defined(DSM2)
 void init_serial(uint32_t port, uint32_t baudrate, uint32_t period_half_us)
 {
+  if (port == INTERNAL_MODULE) {
+    intmoduleSerialStart(baudrate, period_half_us);
+  }
   if (port == EXTERNAL_MODULE) {
     extmoduleSerialStart(baudrate, period_half_us);
   }
@@ -88,6 +87,9 @@ void init_serial(uint32_t port, uint32_t baudrate, uint32_t period_half_us)
 
 void disable_serial(uint32_t port)
 {
+  if (port == INTERNAL_MODULE) {
+    intmoduleStop();
+  }
   if (port == EXTERNAL_MODULE) {
     extmoduleStop();
   }
