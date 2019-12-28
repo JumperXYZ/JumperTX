@@ -943,7 +943,7 @@ PACK(struct TrainerData {
     NOBACKUP(uint8_t blOffBright:7); \
     NOBACKUP(char bluetoothName[LEN_BLUETOOTH_NAME]);
 #elif defined(PCBTARANIS)
-  #if defined(BLUETOOTH)
+  #if defined(BLUETOOTH) || defined(BLUETOOTH_MISSING)
     #define BLUETOOTH_FIELDS \
       uint8_t spare; \
       char bluetoothName[LEN_BLUETOOTH_NAME];

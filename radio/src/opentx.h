@@ -1792,6 +1792,8 @@ extern JitterMeter<uint16_t> avgJitter[NUM_ANALOGS];
 
 #if defined(BLUETOOTH)
 #include "bluetooth.h"
+#else
+  #define IS_BLUETOOTH_CHIP_PRESENT()     (false)
 #endif
 
 #endif // _OPENTX_H_

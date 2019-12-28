@@ -109,7 +109,6 @@ if(PCB STREQUAL XLITE)
 else()
   set(TARGET_SRC
     ${TARGET_SRC}
-    intmodule_pulses_driver.cpp
     trainer_driver.cpp
     )
   add_definitions(-DSBUS)
@@ -118,8 +117,22 @@ else()
     ../sbus.cpp
     )
 endif()
+if(PCB STREQUAL T12)
+  add_definitions(-DINTERNAL_MULTIMODULE)
+  set(TARGET_SRC
+  ${TARGET_SRC}
+  intmodule_serial_driver.cpp
+  )
+else()
+  set(TARGET_SRC
+  ${TARGET_SRC}
+  intmodule_pulses_driver.cpp
+  )
+endif()
 
-if(PCB STREQUAL X9E OR PCB STREQUAL T12 OR PCB STREQUAL XLITE)
+    
+
+if(PCB STREQUAL X9E OR PCB STREQUAL XLITE)
   add_definitions(-DBLUETOOTH)
   set(TARGET_SRC
     ${TARGET_SRC}
@@ -129,6 +142,8 @@ if(PCB STREQUAL X9E OR PCB STREQUAL T12 OR PCB STREQUAL XLITE)
     ${SRC}
     bluetooth.cpp
     )
+elseif(PCB STREQUAL T12)
+  add_definitions(-DBLUETOOTH_MISSING)
 endif()
 
 set(HSE_VALUE 12000000)
