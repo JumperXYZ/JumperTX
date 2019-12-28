@@ -601,7 +601,6 @@
   #define INTMODULE_TIMER_IRQHandler    TIM3_IRQHandler
   #define INTMODULE_TIMER_FREQ          (PERI1_FREQUENCY * TIMER_MULT_APB1)
 #elif defined(PCBT12)
-  #define INTMODULE_PULSES
   #define INTMODULE_RCC_AHB1Periph      (RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_DMA1)
   #define INTMODULE_RCC_APB1Periph      RCC_APB1Periph_USART3
   #define INTMODULE_RCC_APB2Periph      (RCC_APB2Periph_TIM1)
@@ -610,10 +609,10 @@
   #define INTMODULE_GPIO                GPIOB
   #define INTMODULE_TX_GPIO             GPIOB
   #define INTMODULE_TX_GPIO_PIN         GPIO_Pin_10
-  #define INTMODULE_GPIO_PinSource_TX   GPIO_PinSource10
+  #define INTMODULE_TX_GPIO_PinSource   GPIO_PinSource10
   #define INTMODULE_RX_GPIO             GPIOB
   #define INTMODULE_RX_GPIO_PIN         GPIO_Pin_11
-  #define INTMODULE_GPIO_PinSource_RX   GPIO_PinSource11
+  #define INTMODULE_RX_GPIO_PinSource   GPIO_PinSource11
   #define INTMODULE_USART               USART3
 //STREAM 3 channel 4 or stream 4 channel 7
   #define INTMODULE_GPIO_AF               GPIO_AF_USART3

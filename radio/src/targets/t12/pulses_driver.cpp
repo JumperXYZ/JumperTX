@@ -25,7 +25,7 @@ void extmoduleStop(void);
 
 void intmoduleNoneStart(void);
 void intmodulePxxStart(void);
-void intmoduleSerialStart(uint32_t baudrate, uint8_t rxEnable, uint16_t parity, uint16_t stopBits, uint16_t wordLength);
+void intmoduleSerialStart(uint32_t baudrate, uint32_t period_half_us);
 #if defined(TARANIS_INTERNAL_PPM)
 void intmodulePpmStart(void);
 #endif
@@ -38,7 +38,9 @@ void extmoduleCrossfireStart(void);
 
 void init_pxx(uint32_t port)
 {
-  if (port == EXTERNAL_MODULE)
+  if (port == INTERNAL_MODULE)
+    intmodulePxxStart();
+  else
     extmodulePxxStart();
 }
 
@@ -50,14 +52,13 @@ void disable_pxx(uint32_t port)
     extmoduleStop();
 }
 
-#if defined(DSM2)
 void init_serial(uint32_t port, uint32_t baudrate, uint32_t period_half_us)
 {
   if (port == EXTERNAL_MODULE) {
     extmoduleSerialStart(baudrate, period_half_us);
   }
-  else {
-    intmoduleSerialStart(baudrate, true, USART_Parity_Even, USART_StopBits_2, USART_WordLength_9b);
+  else if(port == INTERNAL_MODULE) {
+    intmoduleSerialStart(baudrate, period_half_us);
   }
 }
 
@@ -66,10 +67,10 @@ void disable_serial(uint32_t port)
   if (port == EXTERNAL_MODULE) {
     extmoduleStop();
   }
-  else 
+  else if(port == INTERNAL_MODULE) {
     intmoduleStop();
+  }
 }
-#endif
 
 void init_ppm(uint32_t port)
 {
@@ -97,11 +98,8 @@ void disable_ppm(uint32_t port)
 
 void init_no_pulses(uint32_t port)
 {
-  if (port == INTERNAL_MODULE) {
-    intmoduleStop();
-    intmoduleTimerStart(10000);
-  }
-
+  if (port == INTERNAL_MODULE)
+    intmoduleNoneStart();
   else
     extmoduleNoneStart();
 }
