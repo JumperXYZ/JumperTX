@@ -25,6 +25,7 @@ void extmoduleStop(void);
 
 void intmoduleNoneStart(void);
 void intmodulePxxStart(void);
+void intmoduleSerialStart(uint32_t baudrate, uint32_t period_half_us);
 #if defined(TARANIS_INTERNAL_PPM)
 void intmodulePpmStart(void);
 #endif
@@ -51,11 +52,13 @@ void disable_pxx(uint32_t port)
     extmoduleStop();
 }
 
-#if defined(DSM2)
 void init_serial(uint32_t port, uint32_t baudrate, uint32_t period_half_us)
 {
   if (port == EXTERNAL_MODULE) {
     extmoduleSerialStart(baudrate, period_half_us);
+  }
+  else if(port == INTERNAL_MODULE) {
+    intmoduleSerialStart(baudrate, period_half_us);
   }
 }
 
@@ -64,8 +67,10 @@ void disable_serial(uint32_t port)
   if (port == EXTERNAL_MODULE) {
     extmoduleStop();
   }
+  else if(port == INTERNAL_MODULE) {
+    intmoduleStop();
+  }
 }
-#endif
 
 void init_ppm(uint32_t port)
 {

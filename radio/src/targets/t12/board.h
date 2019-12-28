@@ -572,6 +572,11 @@ void sportSendBuffer(uint8_t * buffer, uint32_t count);
 uint8_t telemetryGetByte(uint8_t * byte);
 extern uint32_t telemetryErrors;
 
+#if defined(INTERNAL_MULTIMODULE)
+void intmoduleTimerStart(uint32_t periodMs);
+uint8_t intTelemetrGetByte(uint8_t * byte);
+#endif
+
 // PCBREV driver
 #if defined(PCBXLITE)
   #define HAS_SPORT_UPDATE_CONNECTOR()  true
